@@ -1,17 +1,23 @@
-version: "3"
+version: "3.2"
 
 services:
+
   redis:
     image: redis
-  
+
   api: 
-    build: .
-    # ports:
-    #   -"80:80"
+    build: 
+      context: ./api
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
     depends_on:
       - redis
-  
+      - model
+
   model:
-    build: .
+    build: 
+      context: ./model
+      dockerfile: Dockerfile
     depends_on:
       - redis
