@@ -1,9 +1,18 @@
-FROM python:3.7-slim-buster
+FROM python:3.9.16-slim-buster as base
 
-COPY requirements.txt /app/
+COPY ./requirements.txt /model/
 
-RUN pip install -r /app/requirements.txt
+RUN pip install --no-cache-dir --upgrade -r /model/requirements.txt
 
-COPY . /app
+# COPY . /model
 
-CMD ["python", "/app/main.py"]
+# # CMD ["python", "/model/middleware.py"]
+# FROM base as build
+# ENTRYPOINT ["python", "/model/ml_service.py"]
+
+ENV PYTHONPATH=$PYTHONPATH:/src/
+ADD ./ /src/
+WORKDIR /src
+
+FROM base as build
+ENTRYPOINT ["python3", "/src/main.py"]
