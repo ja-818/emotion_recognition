@@ -1,17 +1,17 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
-from ml import sentiment_analysis
+from middleware import predict_sentiment
+import redis
 
 app = FastAPI()
 templates = Jinja2Templates(directory="templates")
 
 @app.get("/", response_class=HTMLResponse)
 def index(request: Request):
-    context = {"request": request}
-    return templates.TemplateResponse("index.html", context)
+    return templates.TemplateResponse("index.html", {"request": request})
 
-
-@app.get("/sentiment")
-def return_sentiment_analysis(prompt: str):
-    return sentiment_analysis(prompt) 
+@app.post("/", response_class=HTMLResponse)
+def send_review(request: Request, review:str = Form(...)):
+    sentiment = "Sentiment:" + predict_sentiment(review)
+    return templates.TemplateResponse("index.html", {"request": request, "sentiment": sentiment})
